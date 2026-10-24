@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f7f8fc" />
+  <meta name="description" content="BriefGuard checks AI-generated work against the original request, shows evidence for each finding, and builds a targeted repair prompt." />
+  <title>BriefGuard — Check the brief. Prove the result.</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%232a4ecb'/%3E%3Cpath d='m16 32 10 10 23-23' fill='none' stroke='white' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Main navigation">
+      <a class="brand" href="#top" aria-label="BriefGuard home">
+        <span class="brand-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3 27 7v8c0 7-4.5 11.5-11 14C9.5 26.5 5 22 5 15V7L16 3Z" fill="currentColor"/><path d="m10 15 4 4 8-9" fill="none" stroke="white" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="brand-word">Brief<span>Guard</span><small>CHECK THE BRIEF. PROVE THE RESULT.</small></span>
+      </a>
+      <div class="sidebar-label">WORKSPACE</div>
+      <nav class="nav-list">
+        <button class="nav-item active" data-nav="workspace"><span class="nav-icon">▦</span> Audit workspace <span class="nav-dot"></span></button>
+        <button class="nav-item" data-nav="how"><span class="nav-icon">✳</span> How it works</button>
+        <button class="nav-item" data-nav="principles"><span class="nav-icon">◎</span> Trust & limitations</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="sidebar-note-icon">✦</div>
+        <div class="sidebar-note-title">Better prompts.<br/>Better results.</div>
+        <p>Catch the gap before you ship the answer.</p>
+        <div class="sidebar-tag"><span></span> Private, local demo</div>
+      </div>
+      <div class="sidebar-footer"><span class="avatar">BG</span><div><strong>Guest workspace</strong><small>No account needed</small></div><span class="more">•••</span></div>
+    </aside>
+
+    <main class="main-content" id="top">
+      <header class="topbar">
+        <div class="crumbs"><span>WORKSPACE</span><b>/</b><strong>NEW AUDIT</strong></div>
+        <div class="topbar-actions">
+          <span class="local-status"><i></i> Local demo · no account needed</span>
+          <button class="icon-button" id="helpButton" aria-label="Open help" title="How it works">?</button>
+          <button class="top-avatar" aria-label="Guest profile">G</button>
+        </div>
+      </header>
+
+      <section class="page-heading">
+        <div>
+          <div class="eyebrow"><span class="sparkle">✦</span> EVIDENCE-FIRST AI CHECKING</div>
+          <h1>Make the output <em>prove it.</em></h1>
+          <p>Check whether AI work matches your original brief, find the gaps, and fix only what's missing.</p>
+        </div>
+        <div class="heading-actions">
+          <button class="button button-quiet" id="resetButton"><span>↻</span> Reset example</button>
+          <button class="button button-primary" id="runAuditTop"><span>✦</span> Run audit <span class="button-arrow">↗</span></button>
+        </div>
+      </section>
+
+      <section class="metrics" aria-label="Audit summary">
+        <div class="metric-card"><div class="metric-icon blue">▤</div><div><small>REQUIREMENTS</small><div class="metric-bottom"><strong id="metricTotal">5</strong><span>in this brief</span></div></div></div>
+        <div class="metric-card"><div class="metric-icon mint">✓</div><div><small>SUPPORTED</small><div class="metric-bottom"><strong id="metricMet">3</strong><span>textual matches</span></div></div></div>
+        <div class="metric-card"><div class="metric-icon coral">!</div><div><small>NEEDS ATTENTION</small><div class="metric-bottom"><strong id="metricIssues">2</strong><span>gaps to review</span></div></div></div>
+        <div class="metric-note"><span class="shield-icon">✓</span><div><strong>Nothing gets hidden.</strong><small>Every finding shows its evidence.</small></div></div>
+      </section>
+
+      <section class="work-grid" id="workspace">
+        <div class="input-column">
+          <article class="panel input-panel">
+            <div class="panel-heading"><div class="step-number">01</div><div class="panel-title-wrap"><h2>Original brief</h2><p>What did you ask the AI to do?</p></div><button class="mini-action" id="clearBrief" title="Clear brief" aria-label="Clear brief">×</button></div>
+            <label class="sr-only" for="briefInput">Original brief</label>
+            <textarea id="briefInput" class="brief-area" spellcheck="true" placeholder="Paste the request or brief here…">Create a three-day vegetarian meal plan for two people, within ₹1,200, with preparation taking no more than 20 minutes per meal. Include a complete shopping list.</textarea>
+            <div class="field-footer"><span><i class="tiny-dot blue-dot"></i> Original request</span><span id="briefCount">0 characters</span></div>
+          </article>
+
+          <article class="panel input-panel output-panel">
+            <div class="panel-heading"><div class="step-number step-purple">02</div><div class="panel-title-wrap"><h2>AI-generated result</h2><p>Paste the answer you want to check.</p></div><button class="mini-action" id="clearOutput" title="Clear result" aria-label="Clear result">×</button></div>
+            <label class="sr-only" for="outputInput">AI-generated result</label>
+            <textarea id="outputInput" class="output-area" spellcheck="true" placeholder="Paste the AI-generated output here…">Day 1 breakfast: Oats & banana (10 minutes). Lunch: chickpea salad (15 minutes). Dinner: paneer wraps (15 minutes).
+Day 2 breakfast: poha (15 minutes). Lunch: vegetable pulao (20 minutes). Dinner: paneer tikka and salad, preparation around 45 minutes.
+Day 3 breakfast: upma (20 minutes). Lunch: rajma rice (35 minutes). Dinner: khichdi (20 minutes).
+All dishes are vegetarian. Estimated total cost ₹1,150. Quantities are listed for one person.
+Shopping list: oats 200g, bananas 3, chickpeas 250g, paneer 400g, rice 1kg, vegetables 1.5kg.</textarea>
+            <div class="field-footer"><span><i class="tiny-dot purple-dot"></i> Pasted output</span><span id="outputCount">0 characters</span></div>
+          </article>
+
+          <div class="input-actions">
+            <button class="button button-outline" id="extractButton"><span>☷</span> Build checklist from brief</button>
+            <button class="button button-primary run-large" id="runAudit"><span>✦</span> Run audit <span class="button-arrow">↗</span></button>
+          </div>
+          <p class="privacy-note"><span>♧</span> Your text stays in this browser demo. No account or API key required.</p>
+        </div>
+
+        <div class="results-column">
+          <article class="panel audit-panel">
+            <div class="audit-header">
+              <div><div class="panel-kicker">LIVE REQUIREMENT CHECK</div><h2>Requirement audit</h2><p>Does the result meet the original request?</p></div>
+              <div class="audit-complete" id="auditComplete"><span>✓</span><div><strong>Audit complete</strong><small id="auditCompleteText">5 requirements checked</small></div></div>
+            </div>
+            <div class="result-toolbar"><div class="status-legend"><span class="legend-item"><i class="legend-green"></i> Met</span><span class="legend-item"><i class="legend-amber"></i> Needs review</span><span class="legend-item"><i class="legend-red"></i> Gap found</span></div><button class="text-action" id="editChecklist"><span>✎</span> Edit checklist</button></div>
+            <div class="checklist" id="checklist" aria-live="polite"></div>
+            <div class="checklist-edit" id="checklistEditor" hidden>
+              <div class="edit-heading"><div><strong>Edit requirements</strong><small>One requirement per line. Keep them specific and testable.</small></div><button class="mini-action" id="closeEditor" aria-label="Close editor">×</button></div>
+              <label for="requirementsInput" class="sr-only">Requirements</label>
+              <textarea id="requirementsInput" rows="5"></textarea>
+              <div class="editor-actions"><button class="button button-quiet" id="cancelEditor">Cancel</button><button class="button button-primary" id="saveEditor">Apply checklist</button></div>
+            </div>
+            <div class="audit-footnote"><span class="info-mark">i</span><span>Text matching is evidence, not proof of truth. Review ambiguous findings before relying on them.</span></div>
+          </article>
+
+          <article class="repair-panel">
+            <div class="repair-header"><div class="repair-icon">✦</div><div><div class="panel-kicker purple-kicker">NEXT BEST ACTION</div><h2>Targeted repair prompt</h2><p>Fix the gaps without losing what already works.</p></div><span class="repair-chip">READY TO COPY</span></div>
+            <div class="repair-content"><label class="sr-only" for="repairPrompt">Targeted repair prompt</label><textarea id="repairPrompt" rows="4" spellcheck="false">Revise only the serving quantities and meals that exceed the 20-minute preparation limit. Ensure the plan serves two people, stays within the ₹1,200 total budget, remains vegetarian, and keeps the three-day structure. Recalculate the cost after revisions.</textarea><button class="button copy-button" id="copyPrompt"><span>▢</span> Copy prompt</button></div>
+            <div class="repair-footer"><span class="repair-footer-icon">↗</span> Copy this prompt into your AI tool to address only the missing requirements.</div>
+          </article>
+          <div class="results-bottom"><span>BriefGuard <b>·</b> transparent, evidence-first checking</span><button id="exportReport" class="text-action">↓ Export report</button></div>
+        </div>
+      </section>
+
+      <section class="info-panel panel" id="howPanel" hidden>
+        <div class="panel-heading"><div class="step-number step-purple">✦</div><div class="panel-title-wrap"><h2>How BriefGuard works</h2><p>A four-step workflow for checking AI-generated work.</p></div><button class="mini-action close-info" aria-label="Close information">×</button></div>
+        <div class="how-grid"><div><span>01</span><h3>Capture the brief</h3><p>Start with the original request. Specific limits and deliverables make stronger checks.</p></div><div><span>02</span><h3>Make requirements visible</h3><p>Turn the request into an editable checklist before you judge the result.</p></div><div><span>03</span><h3>Inspect the evidence</h3><p>Each finding includes an excerpt and a transparent status for human review.</p></div><div><span>04</span><h3>Repair the gap</h3><p>Copy a focused prompt that preserves satisfied constraints and names the missing ones.</p></div></div>
+      </section>
+      <section class="info-panel panel" id="principlesPanel" hidden>
+        <div class="panel-heading"><div class="step-number">◎</div><div class="panel-title-wrap"><h2>Trust & limitations</h2><p>Useful checks should make their limits visible.</p></div><button class="mini-action close-info" aria-label="Close information">×</button></div>
+        <div class="principles-grid"><div><h3>What this prototype does</h3><p>Uses transparent, local text patterns to surface likely matches, explicit contradictions and missing evidence. You can edit the checklist and export the report.</p></div><div><h3>What it cannot prove</h3><p>A matching phrase does not guarantee a factual claim is true. This prototype does not verify nutrition, prices, legal requirements, medical advice or external sources. “Needs review” is intentional.</p></div><div><h3>Privacy by default</h3><p>The demo does not send your brief to an external AI service. Text is processed in your browser. Avoid pasting sensitive material into any demo environment.</p></div></div>
+      </section>
+      <footer class="main-footer"><span>Built to make AI work easier to trust — not blindly trusted.</span><span>Prototype v0.1 <b>·</b> Local-first</span></footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"><span>✓</span><div><strong id="toastTitle">Copied</strong><small id="toastMessage">Your prompt is ready to paste.</small></div></div>
+</body>
+</html>
